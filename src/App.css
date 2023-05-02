@@ -5,3 +5,7 @@
 .todolist{
   margin: 10px;
 }
+
+.buttonActive{
+  background-color: #4fa9a9;
+}

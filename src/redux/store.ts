@@ -1,6 +1,18 @@
 import {combineReducers, createStore} from "redux";
-import {todolistReducer} from "./todolistReducer";
-import {tasksReducer} from "./tasksReducer";
+import {
+    AddTodolistACType,
+    ChangeTodolistFilterACType,
+    ChangeTodolistTitleACType,
+    RemoveTodolistACType,
+    todolistReducer
+} from "./todolistReducer";
+import {
+    AddTaskACType,
+    changeTaskStatusACType,
+    ChangeTaskTitleACType,
+    RemoveTaskACType,
+    tasksReducer
+} from "./tasksReducer";
 
 const rootReducer = combineReducers({
     todolist: todolistReducer,
@@ -10,3 +22,16 @@ const rootReducer = combineReducers({
 export type storeType = ReturnType<typeof rootReducer>
 export const store = createStore(rootReducer)
 
+
+
+
+
+
+export type ActionType= ChangeTodolistFilterACType |
+    RemoveTodolistACType |
+    AddTodolistACType |
+    ChangeTodolistTitleACType |
+    changeTaskStatusACType |
+    AddTaskACType |
+    RemoveTaskACType |
+    ChangeTaskTitleACType

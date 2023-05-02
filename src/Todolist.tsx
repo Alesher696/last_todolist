@@ -1,48 +1,35 @@
-import React, {ChangeEvent} from 'react';
+import React from 'react';
+import {AddItem} from "./AddItem";
+import {initialStateTodolistType,} from "./redux/todolistReducer";
+import {Tasks} from "./Tasks";
+import {ButtonsFilter} from "./ButtonsFilter";
+import {EditableSpan} from "./EditableSpan";
+import {useTodolist} from "./hooks/useTodolist";
 
-import {TaskType} from "./redux/tasksReducer";
 
-type TodolistProps = {
-    todolistId: string
-    todolistFilter: string
-    todolistTitle: string
-    tasks: TaskType[]
-    changeFilter: (todolistId:string, filter: string) => void
-    changeTaskStatus: (todolistId:string,taskId:string, isDone: boolean)=> void
+export type TodolistProps = {
+    todolist: initialStateTodolistType
 }
 
-export const Todolist = (props: TodolistProps) => {
 
-    const onClickHandler = (filter: string) => {
-        props.changeFilter(props.todolistId,filter)
-    }
+export const Todolist = ({todolist}: TodolistProps) => {
 
+    const {id, title, filter} = todolist
 
-    const tasklist = props.tasks.map(t => {
-
-        const onChangeHandler=(e:ChangeEvent<HTMLInputElement>)=>{
-            props.changeTaskStatus(props.todolistId, t.id, e.currentTarget.checked)
-        }
-
-        return (
-            <div key={t.id}>
-                <input type={'checkbox'} checked={t.isDone} onChange={onChangeHandler}/>
-                <span>{t.title}</span>
-                <button>X</button>
-            </div>
-
-        )
-    })
+    const {
+        addTask,
+        removeTodoList,
+        changeFilter,
+        changeTodoTitle
+    } = useTodolist(id, title, filter)
 
     return (
         <div className={'todolist'}>
-            <div>{props.todolistTitle}</div>
-            <input/>
-            <button>+</button>
-            {tasklist}
-            <button onClick={() => onClickHandler('all')}>all</button>
-            <button onClick={() => onClickHandler('active')}>active</button>
-            <button onClick={() => onClickHandler('completed')}>completed</button>
+            <EditableSpan title={title} changeTitle={changeTodoTitle} id={id}/>
+            <button onClick={removeTodoList}>X</button>
+            <AddItem addItem={addTask}/>
+            <Tasks todolistId={id} filter={filter}/>
+            <ButtonsFilter changeFilter={changeFilter}/>
         </div>
     );
 };
