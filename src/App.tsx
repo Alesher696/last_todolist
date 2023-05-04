@@ -1,30 +1,29 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
-import {useDispatch, useSelector} from "react-redux";
-import {storeType} from "./redux/store";
-import {
-    AddTodolistAC,
-    initialStateTodolistType,
-} from "./redux/todolistReducer";
+import {AddTodolistTC, GetTodolistTC,} from "./redux/todolistReducer";
 import {Todolist} from "./Todolist";
 import {AddItem} from "./AddItem";
+import {useAppDispatch, useAppSelector} from "./hooks/hooks";
+import {TodolistSelector} from "./redux/selectors";
 
 
 function App() {
 
-    const todolists = useSelector<storeType, initialStateTodolistType[]>(state => state.todolist)
-
-    const dispatch = useDispatch()
+    const todolists = useAppSelector(TodolistSelector)
+    const dispatch = useAppDispatch()
 
     const addTodolist = (title: string) => {
-        dispatch(AddTodolistAC(title))
+        dispatch(AddTodolistTC(title))
     }
 
-    const todoLists = todolists.map(tl=> <Todolist key={tl.id} todolist={tl}/>)
+    useEffect(()=>{
+        dispatch(GetTodolistTC())
+    },[])
+
     return (
         <div className={'todolists'}>
             <AddItem addItem={addTodolist}/>
-            {todoLists}
+            {todolists.map(tl=> {return <Todolist key={tl.id} todolist={tl}/>})}
         </div>
     )
 }

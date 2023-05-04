@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {ChangeEvent} from 'react';
 import {EditableSpan} from "./EditableSpan";
-import {TaskType} from "./redux/tasksReducer";
-import {useSelector} from "react-redux";
-import {storeType} from "./redux/store";
 import {useTask} from "./hooks/useTask";
+import {useAppSelector} from "./hooks/hooks";
+import {TaskSelector} from "./redux/selectors";
+import {TaskStatuses} from "./api/todolist-api";
 
 
 export type TasksPropsType = {
@@ -14,23 +14,21 @@ export const Tasks = (props: TasksPropsType) => {
 
     const {
         changeTaskTitle,
-        onChangeHandler,
+        changeTaskStatus,
         removeTask
     } = useTask(props)
 
-    let tasks = useSelector<storeType, TaskType[]>(state => state.tasks[props.todolistId])
+    let tasks = useAppSelector(TaskSelector)
 
-    if (props.filter === "active") {
-        tasks = tasks.filter(t => !t.isDone);
-    }
-    if (props.filter === "completed") {
-        tasks = tasks.filter(t => t.isDone);
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>, taskId:string) => {
+        changeTaskStatus(props.todolistId, taskId, e? TaskStatuses.Completed : TaskStatuses.New)
     }
 
-    const taskLists = tasks.map(t => {
+    const taskLists = tasks[props.todolistId]?.map(t => {
+
         return (
-            <div>
-                <input type={'checkbox'} checked={t.isDone} onChange={(e) => onChangeHandler(e, t.id)}/>
+            <div key={t.id}>
+                <input type={'checkbox'} checked={t.status === TaskStatuses.Completed} onChange={(e) => onChangeHandler(e, t.id)}/>
                 <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
                 <button onClick={() => removeTask(t.id)}>X</button>
             </div>

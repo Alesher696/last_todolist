@@ -1,18 +1,19 @@
-import {combineReducers, createStore} from "redux";
+import {AnyAction, applyMiddleware, combineReducers, createStore} from "redux";
 import {
     AddTodolistACType,
     ChangeTodolistFilterACType,
-    ChangeTodolistTitleACType,
+    ChangeTodolistTitleACType, getTodolistsACType,
     RemoveTodolistACType,
     todolistReducer
 } from "./todolistReducer";
 import {
     AddTaskACType,
     changeTaskStatusACType,
-    ChangeTaskTitleACType,
+    ChangeTaskTitleACType, getTasksACType,
     RemoveTaskACType,
     tasksReducer
 } from "./tasksReducer";
+import thunk, {ThunkAction, ThunkDispatch} from "redux-thunk";
 
 const rootReducer = combineReducers({
     todolist: todolistReducer,
@@ -20,12 +21,23 @@ const rootReducer = combineReducers({
 })
 
 export type storeType = ReturnType<typeof rootReducer>
-export const store = createStore(rootReducer)
+export const store = createStore(rootReducer, applyMiddleware(thunk))
+
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = ThunkDispatch<RootState, unknown,AnyAction>
+export type AppThunk<ReturnType = void> = ThunkAction<
+    ReturnType,
+    RootState,
+    unknown,
+    AnyAction
+>
 
 
 
 
 
+//=======================================================
 
 export type ActionType= ChangeTodolistFilterACType |
     RemoveTodolistACType |
@@ -34,4 +46,4 @@ export type ActionType= ChangeTodolistFilterACType |
     changeTaskStatusACType |
     AddTaskACType |
     RemoveTaskACType |
-    ChangeTaskTitleACType
+    ChangeTaskTitleACType | getTodolistsACType | getTasksACType
