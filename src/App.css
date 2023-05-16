@@ -1,6 +1,9 @@
+.app{
+
+}
 .todolists{
   display: flex;
-  margin: 20px;
+  flex-direction: row;
 }
 .todolist{
   margin: 10px;
@@ -8,4 +11,18 @@
 
 .buttonActive{
   background-color: #4fa9a9;
+}
+
+.NavBar{
+}
+
+.ErrorBar{
+  width: 50%;
+  margin: 0 auto;
+}
+.wishList{
+  margin: 0 auto;
+}
+.Btn{
+  display: flex;
 }

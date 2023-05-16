@@ -20,15 +20,16 @@ export const Tasks = (props: TasksPropsType) => {
 
     let tasks = useAppSelector(TaskSelector)
 
-    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>, taskId:string) => {
-        changeTaskStatus(props.todolistId, taskId, e? TaskStatuses.Completed : TaskStatuses.New)
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>, taskId: string) => {
+        changeTaskStatus(props.todolistId, taskId, e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New)
     }
 
     const taskLists = tasks[props.todolistId]?.map(t => {
 
         return (
             <div key={t.id}>
-                <input type={'checkbox'} checked={t.status === TaskStatuses.Completed} onChange={(e) => onChangeHandler(e, t.id)}/>
+                <input type={'checkbox'} checked={!!t.status}
+                       onChange={(e) => onChangeHandler(e, t.id)}/>
                 <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
                 <button onClick={() => removeTask(t.id)}>X</button>
             </div>
