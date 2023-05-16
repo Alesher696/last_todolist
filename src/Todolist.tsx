@@ -5,6 +5,12 @@ import {Tasks} from "./Tasks";
 import {ButtonsFilter} from "./ButtonsFilter";
 import {EditableSpan} from "./EditableSpan";
 import {useTodolist} from "./hooks/useTodolist";
+import ClearIcon from '@mui/icons-material/Clear';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+
+
 
 export type TodolistProps = {
     todolist: initialStateTodolistType
@@ -18,14 +24,29 @@ export const Todolist = ({todolist}: TodolistProps) => {
         changeFilter,
         changeTodoTitle
     } = useTodolist(id, title, filter)
+
+
     return (
-        <div className={'todolist'}>
-            <EditableSpan title={title} changeTitle={changeTodoTitle} id={id}/>
-            <button onClick={removeTodoList} disabled={entityStatus === 'loading'}>X</button>
-            <AddItem addItem={addTask} disabled={entityStatus === 'loading'}/>
-            <Tasks todolistId={id} filter={filter}/>
-            <ButtonsFilter changeFilter={changeFilter}/>
-        </div>
+
+        <Card sx={{minWidth: 275, m:2}}>
+            <CardActions>
+                <EditableSpan title={title} changeTitle={changeTodoTitle} id={id}/>
+                <Button onClick={removeTodoList} disabled={entityStatus === 'loading'}
+                        color={'primary'}><ClearIcon/></Button>
+            </CardActions>
+            <CardActions>
+                <AddItem addItem={addTask} disabled={entityStatus === 'loading'}/>
+            </CardActions>
+            <CardActions>
+                <Tasks todolistId={id} filter={filter}/>
+            </CardActions>
+            <CardActions>
+                <ButtonsFilter changeFilter={changeFilter}/>
+            </CardActions>
+        </Card>
+        // <div className={'todolist'}>
+        //
+        // </div>
     );
 };
 

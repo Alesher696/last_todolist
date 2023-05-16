@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import './App.css';
 
 
@@ -11,18 +13,27 @@ export const ButtonsFilter = (props: ButtonsFilterPropsType) => {
 
     const [filters,setFilter] = useState('all')
 
-    const onClickHandler = (filter: string) => {
+
+    const handleChange = (
+        event: React.MouseEvent<HTMLElement>,
+        filter: string,
+    ) => {
         props.changeFilter(filter)
         setFilter(filter)
-    }
-
-
+    };
 
     return (
         <div>
-            <button onClick={() => onClickHandler('all')} className={filters === 'all'? 'buttonActive': ''}>all</button>
-            <button onClick={() => onClickHandler('active')}className={filters === 'active'? 'buttonActive': ''}>active</button>
-            <button onClick={() => onClickHandler('completed')} className={filters === 'completed'? 'buttonActive': ''}>completed</button>
+            <ToggleButtonGroup
+                color="primary"
+                value={filters}
+                exclusive
+                onChange={handleChange}
+            >
+                <ToggleButton value="all" className={filters === 'all'? 'buttonActive': ''}>all</ToggleButton>
+                <ToggleButton value="active">active</ToggleButton>
+                <ToggleButton value="completed">completed</ToggleButton>
+            </ToggleButtonGroup>
         </div>
     );
 };

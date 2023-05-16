@@ -1,17 +1,20 @@
 import {Dispatch} from "redux";
 import {TaskPriority, TasksAPI, TaskStatuses, TaskType, UpdateTaskModelType} from "../api/todolist-api";
 import {ActionsType, storeType} from "./store";
-import {appActionsType, setErrorAC, setStatusAC} from "./appReducer";
+import {setErrorAC, setStatusAC} from "./appReducer";
 import {handleServerAppError} from "../utils/error-utils";
+import {setEntityStatusAC, setEntityStatusACType} from "./todolistReducer";
 
 
-export type tasksActionType =  AddTaskACType | RemoveTaskACType | UpdateTaskACType | getTasksACType
+export type tasksActionType =  AddTaskACType | RemoveTaskACType | UpdateTaskACType | getTasksACType | setEntityStatusACType
 
 export type initialStateTaskType = {
     [key: string]: TaskType[]
 }
 
-const initialState = {}
+const initialState = {
+
+}
 
 export const tasksReducer = (state: initialStateTaskType = initialState, action: ActionsType): initialStateTaskType => {
     switch (action.type) {
@@ -105,18 +108,24 @@ export const addTaskTC = (todolistId: string, title: string) => async (dispatch:
     //     )
 
     dispatch(setStatusAC('loading'))
+    dispatch(setEntityStatusAC(todolistId, 'loading'))
     const result = await TasksAPI.addTask(todolistId, title)
     if (result.data.resultCode === 0) {
                         dispatch(AddTaskAC(todolistId, result.data.data.item))
+        dispatch(setEntityStatusAC(todolistId, 'succeeded'))
         dispatch(setStatusAC('succeeded'))
                     } else {
                         if (result.data.messages.length) {
                             console.log(result)
                             dispatch(setErrorAC(result.data.messages[0]))
                             dispatch(setStatusAC('failed'))
+                            dispatch(setEntityStatusAC(todolistId, 'failed'))
+
                         } else {
                             dispatch(setErrorAC('Some error occurred'))
                             dispatch(setStatusAC('failed'))
+                            dispatch(setEntityStatusAC(todolistId, 'failed'))
+
                         }
                     }
 

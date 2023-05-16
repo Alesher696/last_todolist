@@ -1,5 +1,4 @@
 import {ActionsType, AppDispatch, AppThunk} from "./store";
-import {Dispatch} from "redux";
 import {TodolistAPI, TodolistType} from "../api/todolist-api";
 import {getTasksTC} from "./tasksReducer";
 import {RequestStatusType, setStatusAC} from "./appReducer";
@@ -67,7 +66,7 @@ const getTodoListsAC = (todos: TodolistType[]) => {
 }
 
 export type setEntityStatusACType = ReturnType<typeof setEntityStatusAC>
-const setEntityStatusAC = (todoListId: string, entityStatus: RequestStatusType )=>{
+export const setEntityStatusAC = (todoListId: string, entityStatus: RequestStatusType )=>{
     return{
         type:'SET-ENTITY-STATUS',
         entityStatus,

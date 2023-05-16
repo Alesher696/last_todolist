@@ -4,7 +4,9 @@ import {useTask} from "./hooks/useTask";
 import {useAppSelector} from "./hooks/hooks";
 import {TaskSelector} from "./redux/selectors";
 import {TaskStatuses} from "./api/todolist-api";
-
+import ClearIcon from '@mui/icons-material/Clear';
+import Button from "@mui/material/Button";
+import Checkbox from '@mui/material/Checkbox';
 
 export type TasksPropsType = {
     todolistId: string
@@ -24,20 +26,27 @@ export const Tasks = (props: TasksPropsType) => {
         changeTaskStatus(props.todolistId, taskId, e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New)
     }
 
-    const taskLists = tasks[props.todolistId]?.map(t => {
+
+    // if (props.filter === 'active') {
+    //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.New)
+    // } if(props.filter === 'completed'){
+    //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.Completed)
+    // } else
+
+    let filteredTasks = tasks[props.todolistId]?.map(t => {
 
         return (
             <div key={t.id}>
-                <input type={'checkbox'} checked={!!t.status}
-                       onChange={(e) => onChangeHandler(e, t.id)}/>
+                <Checkbox  checked={!!t.status}
+                           onChange={(e) => onChangeHandler(e, t.id)}/>
                 <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
-                <button onClick={() => removeTask(t.id)}>X</button>
+                <Button onClick={() => removeTask(t.id)} color={'primary'}><ClearIcon/></Button>
             </div>
         )
     })
     return (
         <div>
-            {taskLists}
+            {filteredTasks}
         </div>
     );
 };
