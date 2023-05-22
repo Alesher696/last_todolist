@@ -23,8 +23,8 @@ export const ButtonsFilter = (props: ButtonsFilterPropsType) => {
     };
 
     return (
-        <div>
             <ToggleButtonGroup
+                className={'btnFilters'}
                 color="primary"
                 value={filters}
                 exclusive
@@ -34,7 +34,6 @@ export const ButtonsFilter = (props: ButtonsFilterPropsType) => {
                 <ToggleButton value="active">active</ToggleButton>
                 <ToggleButton value="completed">completed</ToggleButton>
             </ToggleButtonGroup>
-        </div>
     );
 };
 

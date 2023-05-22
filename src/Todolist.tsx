@@ -9,6 +9,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
+import {TransitionGroup} from "react-transition-group";
 
 
 
@@ -25,9 +26,8 @@ export const Todolist = ({todolist}: TodolistProps) => {
         changeTodoTitle
     } = useTodolist(id, title, filter)
 
-
     return (
-
+<TransitionGroup>
         <Card sx={{minWidth: 275, m:2}}>
             <CardActions>
                 <EditableSpan title={title} changeTitle={changeTodoTitle} id={id}/>
@@ -44,9 +44,7 @@ export const Todolist = ({todolist}: TodolistProps) => {
                 <ButtonsFilter changeFilter={changeFilter}/>
             </CardActions>
         </Card>
-        // <div className={'todolist'}>
-        //
-        // </div>
+</TransitionGroup>
     );
 };
 

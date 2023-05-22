@@ -1,40 +1,28 @@
 import React, {useEffect} from 'react';
-import './App.css';
-import {AddTodolistTC, GetTodolistTC,} from "./redux/todolistReducer";
-import {Todolist} from "./Todolist";
-import {AddItem} from "./AddItem";
+import {Route, Routes} from "react-router-dom";
+import {LayOut} from "./components/LayOut";
+import {Login} from "./components/login";
 import {useAppDispatch, useAppSelector} from "./hooks/hooks";
-import {appSelector, TodolistSelector} from "./redux/selectors";
-import {LoadingBar} from "./components/LoadingBar";
-import {NavBar} from "./components/NavBar";
-import {ErrorBar} from "./components/ErrorBar";
+import {appSelector} from "./redux/selectors";
+import {Loader} from "./components/Loader";
+import {initializeAppTC} from "./redux/appReducer";
 
 function App() {
-    const todolists = useAppSelector(TodolistSelector)
-    const app = useAppSelector(appSelector)
     const dispatch = useAppDispatch()
-
-    const addTodolist = (title: string) => {
-        dispatch(AddTodolistTC(title))
-    }
-
+    const app = useAppSelector(appSelector)
     useEffect(() => {
-        dispatch(GetTodolistTC())
+        dispatch(initializeAppTC())
     }, [])
-    return (
-        <div className={'app'}>
-            <NavBar/>
-            {app.status === "loading" && <LoadingBar/>}
-            <br/>
-            <AddItem addItem={addTodolist} disabled={false}/>
-            <div className={'todolists'}>
-                {todolists.map(tl => {
-                    return <Todolist key={tl.id} todolist={tl}/>
-                })}
-            </div>
 
-            <ErrorBar/>
-        </div>
+    if(!app.isInitialized){
+        return <Loader/>
+    } else
+
+    return (
+        <Routes>
+            <Route path={'/'} element={<LayOut/>}></Route>
+            <Route path={'/login'} element={<Login/>}></Route>
+        </Routes>
     )
 }
 

@@ -52,6 +52,12 @@ export type ResponseType<T> = {
     data: T
 }
 
+export type LoginParamsType={
+    email: string
+    password: string
+    rememberMe?: boolean
+}
+
 const Instanse = axios.create({
     withCredentials: true,
     baseURL: 'https://social-network.samuraijs.com/api/1.1/',
@@ -87,5 +93,17 @@ export const TasksAPI = {
     },
     deleteTask(todolistId: string, taskId: string) {
         return Instanse.delete(`todo-lists/${todolistId}/tasks/${taskId}`)
+    }
+}
+
+export const AuthAPI = {
+    me(){
+        return Instanse.get<ResponseType<{ id: number, login: string, email:string}>>('auth/me').then(res => res)
+    },
+    AuthLogin(data:LoginParamsType){
+        return Instanse.post<ResponseType<{ userId: number}>>('auth/login', data)
+    },
+    logout(){
+        return Instanse.delete('auth/login')
     }
 }

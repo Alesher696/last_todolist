@@ -7,6 +7,10 @@ import {TaskStatuses} from "./api/todolist-api";
 import ClearIcon from '@mui/icons-material/Clear';
 import Button from "@mui/material/Button";
 import Checkbox from '@mui/material/Checkbox';
+import {TransitionGroup, CSSTransition} from "react-transition-group";
+import './App.css'
+
+
 
 export type TasksPropsType = {
     todolistId: string
@@ -26,27 +30,30 @@ export const Tasks = (props: TasksPropsType) => {
         changeTaskStatus(props.todolistId, taskId, e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New)
     }
 
-
     // if (props.filter === 'active') {
     //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.New)
     // } if(props.filter === 'completed'){
     //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.Completed)
     // } else
 
-    let filteredTasks = tasks[props.todolistId]?.map(t => {
-
-        return (
-            <div key={t.id}>
-                <Checkbox  checked={!!t.status}
-                           onChange={(e) => onChangeHandler(e, t.id)}/>
-                <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
-                <Button onClick={() => removeTask(t.id)} color={'primary'}><ClearIcon/></Button>
-            </div>
+    let filteredTasks = tasks[props.todolistId]?.map(t => (
+            <CSSTransition key={t.id}
+                           timeout={500}
+                           classNames='item'>
+                <div key={t.id}>
+                    <Checkbox checked={!!t.status}
+                              onChange={(e) => onChangeHandler(e, t.id)}/>
+                    <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
+                    <Button onClick={() => removeTask(t.id)} color={'primary'}><ClearIcon/></Button>
+                </div>
+            </CSSTransition>
         )
-    })
+    )
     return (
         <div>
-            {filteredTasks}
+            <TransitionGroup>
+                {filteredTasks}
+            </TransitionGroup>
         </div>
     );
 };

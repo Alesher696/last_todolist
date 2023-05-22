@@ -2,6 +2,7 @@ import {ActionsType, AppDispatch, AppThunk} from "./store";
 import {TodolistAPI, TodolistType} from "../api/todolist-api";
 import {getTasksTC} from "./tasksReducer";
 import {RequestStatusType, setStatusAC} from "./appReducer";
+import {Dispatch} from "redux";
 
 export type todolistsActionType = RemoveTodolistACType | AddTodolistACType
     | ChangeTodolistTitleACType | ChangeTodolistFilterACType
@@ -100,7 +101,7 @@ export const GetTodolistTC = (): AppThunk => async (dispatch: AppDispatch) => {
 // }
 
 
-export const AddTodolistTC = (title: string):AppThunk => async (dispatch) => {
+export const AddTodolistTC = (title: string):AppThunk => async (dispatch: Dispatch<ActionsType>) => {
     try {
         dispatch(setStatusAC('loading'))
         const result = await TodolistAPI.addTodolist(title)
