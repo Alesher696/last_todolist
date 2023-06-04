@@ -8,11 +8,13 @@ import {useAppDispatch, useAppSelector} from "../hooks/hooks";
 import {appSelector, authSelector, TodolistSelector} from "../redux/selectors";
 import {AddTodolistTC, GetTodolistTC} from "../redux/todolistReducer";
 import '../App.css'
-import {Navigate} from "react-router-dom";
+import {Navigate, Outlet} from "react-router-dom";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
+import {getBackGroundURLTC} from "../redux/appReducer";
 
+type LayOutProps = {}
 
-export const LayOut = () => {
+export const LayOut = (props: LayOutProps) => {
 
     const todolists = useAppSelector(TodolistSelector)
     const app = useAppSelector(appSelector)
@@ -28,32 +30,44 @@ export const LayOut = () => {
             return
         }
         dispatch(GetTodolistTC())
+        dispatch(getBackGroundURLTC())
     }, [])
 
-
+    
     if (!auth.isLoggedIn) {
         return <Navigate to={'/login'}/>
     }
 
+
     return (
-        <div className={'app'}>
+        <div className={'app'} style={{backgroundImage: `url(${app.BackgroundURL})`}}>
             {/*<Loader/>*/}
             <NavBar/>
             {app.status === "loading" && <LoadingBar/>}
             <br/>
-            <AddItem addItem={addTodolist} disabled={false}/>
-            <TransitionGroup className={'todolists'}>
-                {todolists.map((tl, index) => {
-                    return <CSSTransition key={tl.id}
-                                          timeout={500}
-                                          classNames='todoStyle'
-                    >
-                        <Todolist key={tl.id} todolist={tl}/>
-                    </CSSTransition>
-                })}
-            </TransitionGroup>
+            <div className={'additionalApp'}>
+                <br/>
+                <div className={'inputs'}>
+                    <Outlet/>
+                    <br/>
+                    <AddItem addItem={addTodolist} disabled={false}/>
+                </div>
+                <TransitionGroup className={'todolists'}>
+                    {todolists.map((tl, index) => {
+                        return (
+                            <CSSTransition key={tl.id}
+                                           timeout={500}
+                                           classNames='todoStyle'
+                            >
+                                <Todolist key={tl.id} todolist={tl} index={index}/>
+                            </CSSTransition>
+                        )
+                    })}
+                </TransitionGroup>
+            </div>
             <ErrorBar/>
         </div>
     );
 };
+
 

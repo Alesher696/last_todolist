@@ -7,33 +7,32 @@ import './App.css';
 
 type ButtonsFilterPropsType = {
     changeFilter: (filter: string) => void
+    filter: string
 }
 
 export const ButtonsFilter = (props: ButtonsFilterPropsType) => {
-
-    const [filters,setFilter] = useState('all')
-
 
     const handleChange = (
         event: React.MouseEvent<HTMLElement>,
         filter: string,
     ) => {
         props.changeFilter(filter)
-        setFilter(filter)
+        // setFilter(filter)
     };
 
     return (
             <ToggleButtonGroup
                 className={'btnFilters'}
                 color="primary"
-                value={filters}
+                value={props.filter}
                 exclusive
                 onChange={handleChange}
             >
-                <ToggleButton value="all" className={filters === 'all'? 'buttonActive': ''}>all</ToggleButton>
+                <ToggleButton value="all" >all</ToggleButton>
                 <ToggleButton value="active">active</ToggleButton>
                 <ToggleButton value="completed">completed</ToggleButton>
             </ToggleButtonGroup>
     );
 };
 
+// className={props.filter === 'all'? 'buttonActive': ''}

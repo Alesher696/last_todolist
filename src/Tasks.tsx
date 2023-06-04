@@ -11,11 +11,11 @@ import {TransitionGroup, CSSTransition} from "react-transition-group";
 import './App.css'
 
 
-
 export type TasksPropsType = {
     todolistId: string
     filter: string
 }
+
 export const Tasks = (props: TasksPropsType) => {
 
     const {
@@ -30,13 +30,17 @@ export const Tasks = (props: TasksPropsType) => {
         changeTaskStatus(props.todolistId, taskId, e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New)
     }
 
-    // if (props.filter === 'active') {
-    //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.New)
-    // } if(props.filter === 'completed'){
-    //     filteredTasks = tasks[props.todolistId].filter(el=> el.status !== TaskStatuses.Completed)
-    // } else
+    let allTasks = tasks[props.todolistId];
 
-    let filteredTasks = tasks[props.todolistId]?.map(t => (
+    if (props.filter === 'active') {
+       allTasks = tasks[props.todolistId].filter(el=> el.status === TaskStatuses.New)
+
+    } if(props.filter === 'completed'){
+        allTasks = tasks[props.todolistId].filter(el=> el.status === TaskStatuses.Completed)
+
+    }
+
+     let mappedTasks = allTasks?.map(t => (
             <CSSTransition key={t.id}
                            timeout={500}
                            classNames='item'>
@@ -44,15 +48,17 @@ export const Tasks = (props: TasksPropsType) => {
                     <Checkbox checked={!!t.status}
                               onChange={(e) => onChangeHandler(e, t.id)}/>
                     <EditableSpan title={t.title} id={t.id} changeTitle={changeTaskTitle}/>
-                    <Button onClick={() => removeTask(t.id)} color={'primary'}><ClearIcon/></Button>
+                    <Button onClick={() => removeTask(t.id)} color={'primary'}
+                    ><ClearIcon/></Button>
                 </div>
             </CSSTransition>
         )
     )
+
     return (
         <div>
             <TransitionGroup>
-                {filteredTasks}
+                {mappedTasks}
             </TransitionGroup>
         </div>
     );

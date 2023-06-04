@@ -11,7 +11,7 @@ export type todolistsActionType = RemoveTodolistACType | AddTodolistACType
 export type initialStateTodolistType = TodolistType & { filter: string, entityStatus: RequestStatusType }
 
 const initialState: initialStateTodolistType[] = [
-    // {id: todolistId1, title: "What to learn", filter: 'all'},
+    // {id: todolistId1, title: "What to learn", filter: 'all', entityStatus: RequestStatusType },
     // {id: todolistId2, title: "What to buy", filter: 'all'}
 ]
 

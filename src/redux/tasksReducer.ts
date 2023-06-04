@@ -1,36 +1,52 @@
 import {Dispatch} from "redux";
 import {TaskPriority, TasksAPI, TaskStatuses, TaskType, UpdateTaskModelType} from "../api/todolist-api";
 import {ActionsType, storeType} from "./store";
-import {setErrorAC, setStatusAC} from "./appReducer";
+import {RequestStatusType, setErrorAC, setStatusAC} from "./appReducer";
 import {handleServerAppError} from "../utils/error-utils";
-import {setEntityStatusAC, setEntityStatusACType} from "./todolistReducer";
+import {AddTodolistACType, RemoveTodolistACType, setEntityStatusAC, setEntityStatusACType} from "./todolistReducer";
 
 
-export type tasksActionType =  AddTaskACType | RemoveTaskACType | UpdateTaskACType | getTasksACType | setEntityStatusACType
+export type tasksActionType = AddTaskACType | RemoveTaskACType | UpdateTaskACType |
+    getTasksACType | setEntityStatusACType | setEntityTaskStatusACType |
+    AddTodolistACType | RemoveTodolistACType
+
+
+type TasksType = TaskType & { entityTaskStatus: string }
 
 export type initialStateTaskType = {
-    [key: string]: TaskType[]
+    [key: string]: TasksType[]
 }
 
-const initialState = {
 
-}
+const initialState = {}
 
-export const tasksReducer = (state: initialStateTaskType = initialState, action: ActionsType): initialStateTaskType => {
+export const tasksReducer = (state: initialStateTaskType = initialState, action: tasksActionType): initialStateTaskType => {
     switch (action.type) {
         case "GET-TASKS": {
-            return {...state, [action.todolistId]: action.tasks.map(el => ({...el}))}
+            return {...state, [action.todolistId]: action.tasks.map(el => ({...el, entityTaskStatus: 'idle'}))}
         }
         case 'UPDATE-TASK': {
-            return {...state, [action.todoListId]: state[action.todoListId].map(t => t.id === action.taskId ? {...t, ...action.model} : t)}
+            return {
+                ...state,
+                [action.todoListId]: state[action.todoListId].map(t => t.id === action.taskId ? {...t, ...action.model} : t)
+            }
         }
         case 'ADD-TODOLIST':
             return {...state, [action.todolist.id]: []}
         case 'ADD-TASK': {
-            return {...state, [action.todolistId]: [action.newTask, ...state[action.todolistId]]}
+            return {
+                ...state,
+                [action.todolistId]: [{...action.newTask, entityTaskStatus: 'idle'}, ...state[action.todolistId]]
+            }
         }
         case'REMOVE-TASK': {
             return {...state, [action.todoListId]: state[action.todoListId].filter(el => el.id !== action.taskId)}
+        }
+        case 'SET-TASK-STATUS': {
+            return {
+                ...state,
+                [action.todolistId]: state[action.todolistId].map(el => ({...el, entityTaskStatus: action.status}))
+            }
         }
         case 'REMOVE-TODOLIST': {
             const copyState = {...state}
@@ -43,7 +59,7 @@ export const tasksReducer = (state: initialStateTaskType = initialState, action:
 }
 
 export type AddTaskACType = ReturnType<typeof AddTaskAC>
-export const AddTaskAC = (todolistId: string, newTask: TaskType) => {
+export const AddTaskAC = (todolistId: string, newTask: TasksType) => {
     return {
         type: 'ADD-TASK',
         newTask,
@@ -80,6 +96,16 @@ const getTasksAC = (todolistId: string, tasks: TaskType[]) => {
 
 }
 
+export type setEntityTaskStatusACType = ReturnType<typeof setEntityTaskStatusAC>
+const setEntityTaskStatusAC = (todolistId: string, taskId: string, status: RequestStatusType) => {
+    return {
+        type: 'SET-TASK-STATUS',
+        todolistId,
+        taskId,
+        status
+    } as const
+}
+
 export const getTasksTC = (todolistId: string) => async (dispatch: Dispatch<ActionsType>) => {
     try {
         const result = await TasksAPI.getTasks(todolistId)
@@ -111,29 +137,30 @@ export const addTaskTC = (todolistId: string, title: string) => async (dispatch:
     dispatch(setEntityStatusAC(todolistId, 'loading'))
     const result = await TasksAPI.addTask(todolistId, title)
     if (result.data.resultCode === 0) {
-                        dispatch(AddTaskAC(todolistId, result.data.data.item))
+        dispatch(AddTaskAC(todolistId, result.data.data.item))
         dispatch(setEntityStatusAC(todolistId, 'succeeded'))
         dispatch(setStatusAC('succeeded'))
-                    } else {
-                        if (result.data.messages.length) {
-                            console.log(result)
-                            dispatch(setErrorAC(result.data.messages[0]))
-                            dispatch(setStatusAC('failed'))
-                            dispatch(setEntityStatusAC(todolistId, 'failed'))
+    } else {
+        if (result.data.messages.length) {
+            dispatch(setErrorAC(result.data.messages[0]))
+            dispatch(setStatusAC('failed'))
+            dispatch(setEntityStatusAC(todolistId, 'failed'))
 
-                        } else {
-                            dispatch(setErrorAC('Some error occurred'))
-                            dispatch(setStatusAC('failed'))
-                            dispatch(setEntityStatusAC(todolistId, 'failed'))
+        } else {
+            dispatch(setErrorAC('Some error occurred'))
+            dispatch(setStatusAC('failed'))
+            dispatch(setEntityStatusAC(todolistId, 'failed'))
 
-                        }
-                    }
-
+        }
+    }
 }
+
 export const removeTaskTC = (todolistId: string, taskId: string) => async (dispatch: Dispatch<ActionsType>) => {
     try {
+        dispatch(setEntityTaskStatusAC(todolistId, taskId, 'loading'))
         const result = await TasksAPI.deleteTask(todolistId, taskId)
         dispatch(RemoveTaskAC(todolistId, taskId))
+        dispatch(setEntityTaskStatusAC(todolistId, taskId, 'idle'))
     } catch (e) {
         console.log(e)
     }
@@ -158,7 +185,7 @@ export const updateTaskTC = (todolistId: string, taskId: string, model: UpdateDo
     }
 
     const result = await TasksAPI.updateTask(todolistId, taskId, apiModel)
-    if(result.data.resultCode === 0){
+    if (result.data.resultCode === 0) {
         dispatch(UpdateTaskAC(todolistId, taskId, apiModel))
     } else {
         handleServerAppError(result.data, dispatch)

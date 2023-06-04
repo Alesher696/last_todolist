@@ -6,12 +6,17 @@ import {setIsLoggedInAC, setLoginAC} from "./authReduser";
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
 
-export type appActionsType = ReturnType<typeof setStatusAC> | ReturnType<typeof setErrorAC> | ReturnType<typeof setIsInitializedAC>
+export type appActionsType =
+    ReturnType<typeof setStatusAC> |
+    ReturnType<typeof setErrorAC> |
+    ReturnType<typeof setIsInitializedAC> |
+    ReturnType<typeof setBackgroundURLAC>
 
 const initialState = {
     status: 'idle' as RequestStatusType,
     error: null as string | null,
-    isInitialized: false
+    isInitialized: false,
+    BackgroundURL: ''
 }
 
 type InitialStateType = typeof initialState
@@ -24,30 +29,39 @@ export const appReducer = (state: InitialStateType = initialState, action: appAc
             return {...state, error: action.error}
         case 'APP/SET-IS-INITIALIZED':
             return {...state, isInitialized: action.isInitialized}
+        case 'APP/SET-BACKGROUND-URL':
+            return {...state, BackgroundURL: action.url}
         default:
             return state
     }
 }
 
-export const setStatusAC = (status: RequestStatusType)=>{
-    return{
-        type:'APP/SET-STATUS',
-        status
-    }as const
+export const setBackgroundURLAC = (url: string) => {
+    return {
+        type: 'APP/SET-BACKGROUND-URL',
+        url
+    } as const
 }
 
-export const setErrorAC = (error: string | null)=>{
-    return{
+export const setStatusAC = (status: RequestStatusType) => {
+    return {
+        type: 'APP/SET-STATUS',
+        status
+    } as const
+}
+
+export const setErrorAC = (error: string | null) => {
+    return {
         type: 'APP/SET-ERROR',
         error
-    }as const
+    } as const
 }
 
-export const setIsInitializedAC = (isInitialized:boolean)=>{
-    return{
+export const setIsInitializedAC = (isInitialized: boolean) => {
+    return {
         type: 'APP/SET-IS-INITIALIZED',
         isInitialized
-    }as const
+    } as const
 }
 
 export const initializeAppTC = () => (dispatch: Dispatch<ActionsType>) => {
@@ -63,4 +77,16 @@ export const initializeAppTC = () => (dispatch: Dispatch<ActionsType>) => {
         }
         dispatch(setIsInitializedAC(true))
     })
+}
+
+export const setBackGroundURLTC = (url:string)=> (dispatch:Dispatch<ActionsType>) =>{
+    localStorage.setItem('backgroundURL', JSON.stringify(url))
+    dispatch(setBackgroundURLAC(url))
+}
+export const getBackGroundURLTC = ()=> (dispatch:Dispatch<ActionsType>)=>{
+    let backGroundURL = localStorage.getItem('backgroundURL')
+    if (backGroundURL) {
+        let newBackGroundURL = JSON.parse(backGroundURL)
+       dispatch(setBackgroundURLAC(newBackGroundURL))
+}
 }
