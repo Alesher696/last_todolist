@@ -2,8 +2,9 @@ import {Dispatch} from "redux";
 import {TaskPriority, TasksAPI, TaskStatuses, TaskType, UpdateTaskModelType} from "../api/todolist-api";
 import {ActionsType, storeType} from "./store";
 import {RequestStatusType, setErrorAC, setStatusAC} from "./appReducer";
-import {handleServerAppError} from "../utils/error-utils";
+import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
 import {AddTodolistACType, RemoveTodolistACType, setEntityStatusAC, setEntityStatusACType} from "./todolistReducer";
+import {isAxiosError} from "axios";
 
 
 export type tasksActionType = AddTaskACType | RemoveTaskACType | UpdateTaskACType |
@@ -109,10 +110,18 @@ const setEntityTaskStatusAC = (todolistId: string, taskId: string, status: Reque
 export const getTasksTC = (todolistId: string) => async (dispatch: Dispatch<ActionsType>) => {
     try {
         const result = await TasksAPI.getTasks(todolistId)
-        dispatch(getTasksAC(todolistId, result.data.items))
-        dispatch(setStatusAC('succeeded'))
-    } catch (e) {
-        console.log(e)
+        if(result.data.error === null){
+            dispatch(getTasksAC(todolistId, result.data.items))
+            dispatch(setStatusAC('succeeded'))
+        }
+        else{
+            handleServerNetworkError(result.data.error, dispatch)
+        }
+
+    } catch (error) {
+        if(isAxiosError(error)){
+            handleServerNetworkError(error, dispatch)
+        }
     }
 }
 
